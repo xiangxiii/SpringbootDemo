@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.demo.common.Result;
+import com.example.springboot.common.Result;
 
 
 import com.example.springboot.service.IUserService;
