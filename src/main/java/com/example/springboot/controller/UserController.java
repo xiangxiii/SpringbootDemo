@@ -2,6 +2,9 @@ package com.example.springboot.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.springboot.common.Constants;
+import com.example.springboot.controller.dto.UserDTO;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
@@ -27,7 +30,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     @Resource
     private IUserService userService;
-
+    @PostMapping("/login")
+    public Result login(@RequestBody UserDTO userDTO){
+        String username = userDTO.getUsername();
+        String password = userDTO.getPassword();
+        if(StringUtils.isBlank(username) || StringUtils.isBlank(password)){
+            return Result.error(Constants.CODE_400,"参数错误");
+        }
+        UserDTO dto = userService.login(userDTO);
+        return Result.success(dto);
+    }
+    @PostMapping("/register")//需改进
+    public Result register(@RequestBody UserDTO userDTO){
+        String username = userDTO.getUsername();
+        String password = userDTO.getPassword();
+        if(StringUtils.isBlank(username) || StringUtils.isBlank(password)){
+            return Result.error(Constants.CODE_400,"参数错误");
+        }
+        return Result.success(userService.register(userDTO));
+    }
 
     @PostMapping
     public Result save(@RequestBody User user) {
@@ -59,9 +80,22 @@ public class UserController {
 
     @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
-    @RequestParam Integer pageSize) {
+                           @RequestParam Integer pageSize,
+                           @RequestParam(defaultValue = "") String username,
+                           @RequestParam(defaultValue = "") String email,
+                           @RequestParam(defaultValue = "") String address
+    ) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("id");
+        if (!"".equals(username)) {
+            queryWrapper.like("username", username);
+        }
+        if (!"".equals(email)) {
+            queryWrapper.like("email", email);
+        }
+        if (!"".equals(address)) {
+            queryWrapper.like("address", address);
+        }
+        queryWrapper.orderByDesc("user_id");
         return Result.success(userService.page(new Page<>(pageNum, pageSize), queryWrapper));
     }
 }
